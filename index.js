@@ -1,36 +1,71 @@
-//define list of freelancers
+// Define list of freelancers
 let freelancersList = [
-  {name: "Alice", occupation: "Writer", price: 30},
-  {name: "Bob", occupation: "Teacher", price: 50},
-  {name: "Carol", occupation: "Programmer", price: 70},
+  { name: "Alice", occupation: "Writer", price: 30 },
+  { name: "Bob", occupation: "Teacher", price: 50 },
+  { name: "Carol", occupation: "Programmer", price: 70 },
 ];
 
-//function to calculate average price
-function getAveragePrice (freelancers) {
-  let totalPrice = freelancers.reduce((total, freelancer) => total + freelancer.price, 0);
-  let average = totalPrice / freelancers.length;
+// Add support for adding random freelancers
+const freelancerNames = ["Jamie", "Meli", "Kyle", "Fiona", "Brian", "Josh"];
+const freelancerOccupations = [
+  "DJ",
+  "Photographer",
+  "Cook",
+  "Videographer",
+  "Graphic Designer",
+];
+const freelancerPrices = [25, 60, 75, 80, 100];
+const maxFreelancers = 10;
 
-  return average;
+/** Adds a freelancer with random properties to the `freelancersList` */
+function addFreelancer() {
+  const name =
+    freelancerNames[Math.floor(Math.random() * freelancerNames.length)];
+  const occupation =
+    freelancerOccupations[
+      Math.floor(Math.random() * freelancerOccupations.length)
+    ];
+  const price =
+    freelancerPrices[Math.floor(Math.random() * freelancerPrices.length)];
+
+  const newFreelancer = { name, occupation, price };
+  freelancersList.push(newFreelancer);
+
+  // Dynamically add a new row to the table
+  if (freelancersList.length <= maxFreelancers) {
+    addFreelancerRow(newFreelancer);
+  } else {
+    clearInterval(addFreelancerIntervalId); // Stop interval when the max is reached
+  }
 }
 
-//calcualte the average price
+/** Calculates the average price of freelancers */
+function getAveragePrice(freelancers) {
+  const totalPrice = freelancers.reduce(
+    (total, freelancer) => total + freelancer.price,
+    0
+  );
+  return totalPrice / freelancers.length;
+}
+
+// Calculate the average price
 const averagePrice = getAveragePrice(freelancersList);
-console.log(`The average starting price is $${averagePrice}`);
 
-
-//function to render average price to the DOM
+/** Renders the average price to the DOM */
 function renderAveragePrice(price) {
-  const root = document.querySelector('#root');
-  const sentElem = document.createElement('p');
-  sentElem.textContent = `The average starting price is $${price}.`
+  const root = document.querySelector("#root");
+  const sentElem = document.createElement("p");
+  sentElem.textContent = `The average starting price is $${price}.`;
   root.append(sentElem);
 }
 
-function renderFreelancersTable(freelancers) {
+/** Initializes the table structure */
+function renderFreelancersTable() {
   const root = document.querySelector("#root");
 
-  // Create table
+  // Create the table
   const table = document.createElement("table");
+  table.id = "freelancersTable";
 
   // Create table header row
   const headerRow = document.createElement("tr");
@@ -47,44 +82,59 @@ function renderFreelancersTable(freelancers) {
   headerRow.appendChild(priceHeading);
 
   table.appendChild(headerRow);
-
-  // Create table rows for freelancers
-  freelancers.forEach((freelancer) => {
-    const row = document.createElement("tr");
-
-    const nameP = document.createElement("td");
-    nameP.textContent = freelancer.name;
-    const occupationP = document.createElement("td");
-    occupationP.textContent = freelancer.occupation;
-    const priceP = document.createElement("td");
-    priceP.textContent = "$" + freelancer.price;
-
-    row.appendChild(nameP);
-    row.appendChild(occupationP);
-    row.appendChild(priceP);
-
-    table.appendChild(row); // Append rows to the table
-  });
-
-  root.appendChild(table); // Append the table to the root
+  root.appendChild(table);
 }
 
-//render the headings and average price
-function render() {
-  const root = document.querySelector('#root');
+/** Adds a single row to the existing table */
+function addFreelancerRow(freelancer) {
+  const table = document.querySelector("#freelancersTable");
 
-  //create an h1 for the main title
+  const row = document.createElement("tr");
+
+  const nameCell = document.createElement("td");
+  nameCell.textContent = freelancer.name;
+
+  const occupationCell = document.createElement("td");
+  occupationCell.textContent = freelancer.occupation;
+
+  const priceCell = document.createElement("td");
+  priceCell.textContent = `$${freelancer.price}`;
+
+  row.appendChild(nameCell);
+  row.appendChild(occupationCell);
+  row.appendChild(priceCell);
+
+  table.appendChild(row);
+}
+
+/** Renders the initial state */
+function render() {
+  const root = document.querySelector("#root");
+
+  // Create and append the main title
   const pageTitle = document.createElement("h1");
   pageTitle.textContent = "Freelancer Forum";
   root.appendChild(pageTitle);
 
+  // Render average price
   renderAveragePrice(averagePrice);
 
+  // Create and append section title
   const h2 = document.createElement("h2");
   h2.textContent = "Available Freelancers";
   root.appendChild(h2);
 
-  renderFreelancersTable(freelancersList);
+  // Render the table structure
+  renderFreelancersTable();
+
+  // Render the initial rows
+  freelancersList.forEach(addFreelancerRow);
 }
 
+// Add freelancers dynamically at intervals
+const addFreelancerIntervalId = setInterval(() => {
+  addFreelancer();
+}, 1000);
+
+// Initial render
 render();
